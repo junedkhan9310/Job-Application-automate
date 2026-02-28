@@ -1,9 +1,8 @@
-
 import re
 import json
 import openai
 import os
-from main import print_exception_details
+from print_exception import print_exception_details
 
 
 from config import Config

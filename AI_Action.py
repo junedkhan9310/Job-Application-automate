@@ -1,8 +1,8 @@
 from selenium.webdriver.common.by import By
-from main import print_exception_details
 
 
 
+from print_exception import print_exception_details
 from gpt_main import new_chatgpt_chat_withID, new_chatgpt_chat_withID_for_drop_down
 
 Question_Data = []

@@ -1,10 +1,4 @@
-
-
 import undetected_chromedriver as uc
-
-
-
-
 
 def init_driver():
     """

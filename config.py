@@ -11,3 +11,4 @@ class Config:
     CITY = os.getenv("CITY")
     JOB_TITLE = os.getenv("JOB_TITLE")
     COMPANY = os.getenv("COMPANY")
+    gpt_API_kye = os.getenv("gpt_API_kye")
