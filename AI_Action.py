@@ -1,4 +1,7 @@
 from selenium.webdriver.common.by import By
+from main import print_exception_details
+
+
 
 from gpt_main import new_chatgpt_chat_withID, new_chatgpt_chat_withID_for_drop_down
 
@@ -60,7 +63,7 @@ def total_questions(browser):
             })
 
         except Exception as e:
-            print(e)
+            print_exception_details(e)
             break
 
 
@@ -86,7 +89,7 @@ def ai_answer_these_questions(browser):
             answer_input.send_keys(str(gpt_response).strip())
 
         except Exception as e:
-            print("Text Question Error:", e)
+            print_exception_details(e)
 
     # ✅ Handle dropdown questions
     for drop_down in drop_down_data:
@@ -108,6 +111,6 @@ def ai_answer_these_questions(browser):
                     break
 
         except Exception as e:
-            print("Dropdown Error:", e)
+            print_exception_details(e)
 
     print("Question tab done")

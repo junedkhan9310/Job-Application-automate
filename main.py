@@ -1,48 +1,50 @@
 import time
-import undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 
 from AI_Action import ai_answer_these_questions
 
+from selenium.webdriver.support import expected_conditions as EC
 
-# =========================================================
-# ===================== SETTINGS ==========================
-# =========================================================
+from dotenv import load_dotenv
+import os
 
-JOB_SEARCH_URL = "https://www.glassdoor.co.in/Job/index.htm"
-WAIT_BETWEEN_APPS = 5
-MAX_APPLICATIONS = 20
+from driver import init_driver
+from form_fill_action import check_and_fill_experience_page, fill_contact_information, handle_ai_question_section
+from selenium.webdriver.support.ui import WebDriverWait
 
-POSTAL_CODE = "560001"
-CITY = "Bangalore"
-JOB_TITLE = "Software Engineer"
-COMPANY = "random"
 
-def init_driver():
-    """
-    Initialize undetected Chrome driver
-    Returns: browser instance
-    """
-    options = uc.ChromeOptions()
 
-    options.add_argument("--start-maximized")
-    options.add_argument("--disable-extensions")
+from config import Config
 
-    # Use persistent profile (optional but useful)
-    options.add_argument(r"--user-data-dir=C:\profiledata")
+import sys
+from datetime import datetime
 
-    browser = uc.Chrome(
-        version_main=144,
-        options=options
+def print_exception_details(e):
+    exc_type, exc_obj, exc_tb = sys.exc_info()
+    # Extract relevant information
+    Exception_Type = exc_type.__name__
+    Line_No = exc_tb.tb_lineno
+    Error_Message = str(e)
+    if '(Session info:' in Error_Message:
+        Error_Message = Error_Message.partition('(Session info:')[0].strip()
+    Error_Message = Error_Message.replace('\n',', ')
+    Function_name = exc_tb.tb_frame.f_code.co_name
+    File_Name = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+    Timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # Timestamp of the error occurrence
+    # Construct the error message with all relevant details
+    Error_Final = (
+        f"Timestamp: {Timestamp} | Error_Message: {Error_Message} | "
+        f"Function: {Function_name} | Exception_Type: {Exception_Type} | "
+        f"File_Name: {File_Name} | Line_No: {Line_No} "
     )
+    # Print the error message
+    print(Error_Final)
+    # Optionally, sleep to allow for error inspection (can be removed if not needed)
+    time.sleep(10)
 
-    return browser
 
-
-# =========================================================
-# ====================== UTILITIES ========================
-# =========================================================
+# browser.get(Config.JOB_SEARCH_URL)
 
 def switch_to_latest_tab(browser):
     """
@@ -59,76 +61,7 @@ def close_current_tab_and_return(browser):
     browser.switch_to.window(browser.window_handles[0])
 
 
-def check_and_fill_experience_page(browser):
-    """
-    Handles last experience page if detected
-    Returns True if page handled, else False
-    """
-    try:
-        if "Enter a job that shows relevant experience" in browser.page_source:
-            browser.find_element(By.ID, "job-title-input").send_keys(JOB_TITLE)
-            browser.find_element(By.ID, "company-name-input").send_keys(COMPANY)
-            return True
-        return False
-    except:
-        return False
 
-
-def fill_contact_information(browser):
-    """
-    Fills postal code and city if contact form appears
-    Returns True if handled
-    """
-    try:
-        if "Postal code" in browser.page_source:
-            browser.find_element(By.ID, "location-fields-postal-code-input").send_keys(POSTAL_CODE)
-            browser.find_element(By.ID, "location-fields-locality-input").send_keys(CITY)
-
-            # Click continue button
-            browser.find_element(
-                By.XPATH,
-                '//*[@id="mosaic-provider-module-apply-contact-info"]//button'
-            ).click()
-
-            time.sleep(2)
-
-            # Resume selection continue
-            browser.find_element(
-                By.XPATH,
-                '//*[@id="mosaic-provider-module-apply-resume-selection"]//button[last()]'
-            ).click()
-
-            time.sleep(2)
-
-            return True
-
-        return False
-    except:
-        return False
-
-
-def handle_ai_question_section(browser):
-    """
-    Detects question section and sends it to AI for answering
-    Returns True if questions handled
-    """
-    try:
-        if "Answer these questions" in browser.page_source:
-            print("AI answering questions...")
-            ai_answer_these_questions(browser)
-
-            browser.find_element(
-                By.XPATH,
-                '//*[@id="mosaic-provider-module-apply-questions"]//button'
-            ).click()
-
-            time.sleep(2)
-
-            return True
-
-        return False
-    except:
-        return False
 
 
 
@@ -140,84 +73,102 @@ def apply_to_jobs(browser):
     - Applies using Easy Apply
     - Handles multi-step form
     """
+    try:
+        wait = WebDriverWait(browser, 15)
+        browser.get(Config.JOB_SEARCH_URL)
+        print("Loading job page...")
 
-    browser.get(JOB_SEARCH_URL)
-
-    print("Loading job page...")
-    time.sleep(5)
-
-    # Scroll to load jobs
-    browser.execute_script("window.scrollTo(0, 1000);")
-    time.sleep(3)
-
-    job_cards = browser.find_elements(
-        By.XPATH,
-        "//*[@id='left-column']/div[1]/ul/li"
-    )
-
-    print(f"Found {len(job_cards)} job cards")
-
-    applications_done = 0
-
-    for job in job_cards:
-
-        if applications_done >= MAX_APPLICATIONS:
-            print("Reached maximum applications limit")
-            break
-
-        # Process only Easy Apply jobs
-        if "Easy Apply" not in job.text:
-            continue
-
-        try:
-            job.click()
-            time.sleep(3)
-
-            # Click Easy Apply button
-            easy_apply_button = browser.find_element(
-                By.XPATH,
-                '//*[@id="app-navigation"]/div[4]/div/div[2]/div/div[1]/header/div[3]/div/div/div/button'
+        wait.until(
+            EC.presence_of_element_located(
+                (By.XPATH, "//*[@id='left-column']/div[1]/ul/li")
             )
-            easy_apply_button.click()
+        )
+        # Count initial jobs
+        initial_count = len(browser.find_elements(By.XPATH,"//*[@id='left-column']/div[1]/ul/li"))
 
-            time.sleep(3)
+        # Scroll to load more
+        browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
-            # Switch tab if new tab opened
-            if len(browser.window_handles) > 1:
-                switch_to_latest_tab(browser)
+        # Wait for more jobs to load
+        wait.until(lambda d: len(d.find_elements(By.XPATH,"//*[@id='left-column']/div[1]/ul/li")) > initial_count)
 
-            # Ensure correct domain
-            if "smartapply.indeed.com" not in browser.current_url:
-                close_current_tab_and_return(browser)
+        job_cards = browser.find_elements(By.XPATH,"//*[@id='left-column']/div[1]/ul/li")
+
+        print(f"Found {len(job_cards)} job cards")
+        applications_done = 0
+
+        for job in job_cards:
+            try:
+                if applications_done >= Config.MAX_APPLICATIONS:
+                    print("Reached maximum applications limit")
+                    break
+
+                # Process only Easy Apply jobs
+                if "Easy Apply" not in job.text:
+                    continue
+
+                try:
+                    job.click()
+                    easy_apply_button = wait.until(EC.element_to_be_clickable((
+                            By.XPATH,
+                            '//*[@id="app-navigation"]/div[4]/div/div[2]/div/div[1]/header/div[3]/div/div/div/button'
+                        ))
+                    )
+                    easy_apply_button.click()
+                    time.sleep(10)
+
+                    # Switch tab if new tab opened
+                    if len(browser.window_handles) > 1:
+                        switch_to_latest_tab(browser)
+
+                    # Ensure correct domain
+                    if "smartapply.indeed.com" not in browser.current_url:
+                        close_current_tab_and_return(browser)
+                        continue
+
+                    print("Smart Apply page opened")
+
+                    # Step 1 - Contact Info
+                    filled_contact_info  = fill_contact_information(browser,Config.POSTAL_CODE,Config.CITY,wait)
+                    if not filled_contact_info:
+                        print("Failed to fill contact information")
+                        close_current_tab_and_return(browser)
+                        continue
+
+                    # Step 2 - AI Questions
+                    filled_ai_questions = handle_ai_question_section(browser,wait)
+                    if not filled_ai_questions:
+                        print("Failed to handle AI questions")
+                        close_current_tab_and_return(browser)
+                        continue
+
+                    # Step 3 - Final Experience Page
+                    experienced_page_filled = check_and_fill_experience_page(browser,Config.JOB_TITLE,Config.COMPANY)
+                    if not experienced_page_filled:
+                        print("Failed to handle experience page")
+                        close_current_tab_and_return(browser)
+                        continue
+
+                    applications_done += 1
+                    print(f"Application #{applications_done} completed")
+
+                    time.sleep(Config.WAIT_BETWEEN_APPS)
+
+                    # Close tab and return
+                    close_current_tab_and_return(browser)
+
+                except Exception as e:
+                    print_exception_details(e)
+                    # Safety close
+                    if len(browser.window_handles) > 1:
+                        close_current_tab_and_return(browser)
+                    continue
+
+            except Exception as e:
+                print_exception_details(e)
                 continue
-
-            print("Smart Apply page opened")
-
-            # Step 1 - Contact Info
-            fill_contact_information(browser)
-
-            # Step 2 - AI Questions
-            handle_ai_question_section(browser)
-
-            # Step 3 - Final Experience Page
-            check_and_fill_experience_page(browser)
-
-            applications_done += 1
-            print(f"Application #{applications_done} completed")
-
-            time.sleep(WAIT_BETWEEN_APPS)
-
-            # Close tab and return
-            close_current_tab_and_return(browser)
-
-        except Exception as e:
-            print("Error while applying:", e)
-            # Safety close
-            if len(browser.window_handles) > 1:
-                close_current_tab_and_return(browser)
-            continue
-
-
+    except Exception as e:
+        print_exception_details(e)
 
 def main():
     browser = init_driver()
