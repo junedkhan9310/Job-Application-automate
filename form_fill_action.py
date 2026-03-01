@@ -3,7 +3,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 from utils.print_exception import print_exception_details
 from AI_Action import ai_answer_these_questions
-
+import time
 
 def fill_contact_information(browser,POSTAL_CODE,CITY,wait):
     """
@@ -28,12 +28,23 @@ def fill_contact_information(browser,POSTAL_CODE,CITY,wait):
             )
             continue_button.click()
 
-            # Resume selection already uploaded resumse so just continue
+            time.sleep(5)  # wait for next step to load
+            # select already uploaded resumse and continue
+            radio = browser.find_element(By.XPATH, '//*[@id=":rf:-input"]')
+            browser.execute_script("arguments[0].click();", radio) 
+
             continue_button = wait.until(
                 EC.element_to_be_clickable((By.CSS_SELECTOR, "button[data-testid='continue-button']"))
             )
             continue_button.click()
+            time.sleep(5)
+            # You send the file path directly to the file input.
+            # file_input = driver.find_element(
+            #     By.CSS_SELECTOR,
+            #     '[data-testid="resume-selection-file-resume-radio-card-file-input"]'
+            # )
 
+            # file_input.send_keys(r"C:\Users\YourName\Desktop\resume.pdf")
             return True
 
         return False

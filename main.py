@@ -55,7 +55,7 @@ def apply_to_jobs(browser):
         browser.execute_script("window.scrollTo(0, document.body.scrollHeight);")
 
         # Wait for more jobs to load
-        wait.until(lambda d: len(d.find_elements(By.XPATH,"//*[@id='left-column']/div[1]/ul/li")) > initial_count)
+        time.sleep(3)   # wait 3 seconds for jobs to load
 
         job_cards = browser.find_elements(By.XPATH,"//*[@id='left-column']/div[1]/ul/li")
 

@@ -17,7 +17,12 @@ def clean_markdown_json(md_string):
     return json.loads(cleaned)
 
 def mock_chatgpt_chat_withID(data):
-    return {"this is how gpt will answer me like this yes"}
+
+    if "years" in data or "many" in data or "experience" in data:
+        return 5
+    else:
+        return "This is a mock response for the question: "
+
 
     
 def new_chatgpt_chat_withID(q,limit):
