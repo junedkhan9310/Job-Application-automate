@@ -114,6 +114,17 @@ def apply_to_jobs(browser):
                         close_current_tab_and_return(browser)
                         continue
 
+                    continue_button = wait.until(
+                        EC.element_to_be_clickable(
+                            (By.CSS_SELECTOR, "button[data-testid='continue-button']")
+                        )
+                    )
+                    continue_button.click()
+
+                    submit_application_button = WebDriverWait(browser, 20).until(
+                        EC.element_to_be_clickable((By.CSS_SELECTOR, '[data-testid="submit-application-button"]')))
+                    submit_application_button.click()
+
                     applications_done += 1
                     print(f"Application #{applications_done} completed")
 

@@ -70,8 +70,8 @@ def total_questions(browser):
 def ai_answer_these_questions(browser):
 
     total_questions(browser)
-    print("Questions extracted:", Question_Data)
-    print("Dropdown extracted:", drop_down_data)
+    # print("Questions extracted:", Question_Data)
+    # print("Dropdown extracted:", drop_down_data)
 
     # ✅ Answer normal text questions
     for data in Question_Data:

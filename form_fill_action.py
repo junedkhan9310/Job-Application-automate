@@ -28,7 +28,8 @@ def fill_contact_information(browser,POSTAL_CODE,CITY,wait):
             )
             continue_button.click()
 
-            time.sleep(5)  # wait for next step to load
+
+            time.sleep(10)  # wait for next step to load
             # select already uploaded resumse and continue
             radio = browser.find_element(By.XPATH, '//*[@id=":rf:-input"]')
             browser.execute_script("arguments[0].click();", radio) 
@@ -63,11 +64,6 @@ def handle_ai_question_section(browser,wait):
             print("AI answering questions...")
             ai_answer_these_questions(browser)
 
-            # browser.find_element(
-            #     By.XPATH,
-            #     '//*[@id="mosaic-provider-module-apply-questions"]//button'
-            # ).click()
-            # time.sleep(2)
             continue_button = wait.until(
                 EC.element_to_be_clickable(
                     (By.CSS_SELECTOR, "button[data-testid='continue-button']")
@@ -79,8 +75,9 @@ def handle_ai_question_section(browser,wait):
             wait.until(EC.staleness_of(continue_button))
 
             return True
+        else:
+            return True  # No AI questions, but still a successful handling
 
-        return False
     except Exception as e:
         print_exception_details(e)
         return False
@@ -93,6 +90,7 @@ def check_and_fill_experience_page(browser,JOB_TITLE,COMPANY):
     Returns True if page handled, else False
     """
     try:
+        time.sleep(10)
         if "Enter a job that shows relevant experience" in browser.page_source:
             browser.find_element(By.ID, "job-title-input").send_keys(JOB_TITLE)
             browser.find_element(By.ID, "company-name-input").send_keys(COMPANY)

@@ -23,6 +23,11 @@ def mock_chatgpt_chat_withID(data):
     else:
         return "This is a mock response for the question: "
 
+def mock_chatgpt_chat_withID_for_drop_down(select_from):
+    options = select_from.split("|")
+    # return any random option
+    return options[0] if options else ""
+
 
     
 def new_chatgpt_chat_withID(q,limit):
@@ -50,7 +55,7 @@ def new_chatgpt_chat_withID_for_drop_down(q,select_from):
     try:
         
         data = f'{{"question": "{q}", "options": "{select_from}"}}'
-        response =  mock_chatgpt_chat_withID(data)
+        response =  mock_chatgpt_chat_withID_for_drop_down(select_from)
 
         # response = client.responses.create(
         # prompt={
