@@ -24,7 +24,7 @@ def mock_chatgpt_chat_withID(data):
         return "This is a mock response for the question: "
 
 def mock_chatgpt_chat_withID_for_drop_down(select_from):
-    options = select_from.split("|")
+    options = select_from.split(",")
     # return any random option
     return options[0] if options else ""
 
