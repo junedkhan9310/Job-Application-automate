@@ -12,3 +12,4 @@ class Config:
     JOB_TITLE = os.getenv("JOB_TITLE")
     COMPANY = os.getenv("COMPANY")
     gpt_API_kye = os.getenv("gpt_API_kye")
+    gpt_Prompt_id = os.getenv("gpt_Prompt_id")

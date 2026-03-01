@@ -27,7 +27,7 @@ def new_chatgpt_chat_withID(q,limit):
         response =  mock_chatgpt_chat_withID(data)
         # response = client.responses.create(
         # prompt={
-        #     "id": os.getenv("gpt_API_kye"),
+        #     "id":Config.gpt_Prompt_id,
         #     "version": "3",
         #     "variables": {
         #     "input_data": f"{data}"
@@ -45,18 +45,20 @@ def new_chatgpt_chat_withID_for_drop_down(q,select_from):
     try:
         
         data = f'{{"question": "{q}", "options": "{select_from}"}}'
-        response = client.responses.create(
-        prompt={
-            "id": os.getenv("gpt_API_kye"),
-            "version": "3",
-            "variables": {
-            "input_data": f"{data}"
-            }
-        }
-        )
-        parsed_data = clean_markdown_json(response.output_text)
+        response =  mock_chatgpt_chat_withID(data)
 
-        return parsed_data 
+        # response = client.responses.create(
+        # prompt={
+        #     "id":Config.gpt_Prompt_id,
+        #     "version": "3",
+        #     "variables": {
+        #     "input_data": f"{data}"
+        #     }
+        # }
+        # )
+        # parsed_data = clean_markdown_json(response.output_text)
+
+        return response 
 
     except Exception as e:
         print_exception_details(e)
