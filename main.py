@@ -1,13 +1,13 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from datetime import datetime
-from driver import init_driver
+from utils.driver import init_driver
 from selenium.webdriver.support.ui import WebDriverWait
 import time
 
 
 from form_fill_action import check_and_fill_experience_page, fill_contact_information, handle_ai_question_section
-from print_exception import print_exception_details
+from utils.print_exception import print_exception_details
 from config import Config
 
 

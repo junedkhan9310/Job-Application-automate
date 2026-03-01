@@ -1,7 +1,7 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 
-from print_exception import print_exception_details
+from utils.print_exception import print_exception_details
 from AI_Action import ai_answer_these_questions
 
 

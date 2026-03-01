@@ -2,10 +2,10 @@ import re
 import json
 import openai
 import os
-from print_exception import print_exception_details
 
 
 from config import Config
+from utils.print_exception import print_exception_details
 
 client = openai.OpenAI(api_key=Config.gpt_API_kye)
 
